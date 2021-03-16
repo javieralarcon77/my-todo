@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useRouteMatch } from "react-router-dom";
 
 const NavMenu = () => {
+  const match = useRouteMatch();
+
+  //console.log(match.url);
 
   const [itemsMenu, setItemsMenu ] = useState([
-    { title: 'Dashboard', slug: '/', active: true },
-    { title: 'Notas', slug: '/', active: false },
-    { title: 'Calendar', slug: '/', active: false },
+    { title: 'Dashboard', slug: '/', active: false },
+    { title: 'Nueva Tarea', slug: '/todo/new', active: false },
+    { title: 'Tareas', slug: '/todo/list', active: false },
+    { title: 'Calendar', slug: '/calendario', active: false },
   ]);
 
   const datosUser = {
@@ -17,6 +22,18 @@ const NavMenu = () => {
   const [ showMenuProfile, setShowMenuProfile ] = useState(false);
   const [ openMenuMobile, setOpenMenuMobile ] = useState(false);
   
+  useEffect(()=>{
+    var url = match.url;
+
+    setItemsMenu( items => {
+      return items.map( item => ({
+        ...item,
+        active: item.slug === url
+      }) )
+    } )
+  },[ match ])
+
+
   const OptionProfile = ({ className }) => (
     <>
       <a href="/" className={ className } role="menuitem" >
@@ -40,17 +57,17 @@ const NavMenu = () => {
               <div className="ml-10 flex items-baseline space-x-4">
                 {
                   itemsMenu.map( (item, i)=>(
-                    <a
-                      href={ item.slug }
+                    <Link
+                      key={ i }
+                      to={ item.slug }
                       className={
                         item.active ?
                         "bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium" :
                         "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                       }
-                      key={ i }
                     >
                       { item.title }
-                    </a>
+                    </Link>
                   ))
                 }
               </div>
