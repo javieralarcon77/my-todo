@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import firebase from "firebase/app";
+
+import { useAuth } from "../../hooks/useAuth";
+
+import iconMenu from '../../assets/icons/menu-bar.svg';
+import imgProfile from '../../assets/user.webp';
 
 const NavMenu = () => {
   const match = useRouteMatch();
+  let history = useHistory();
 
-  //console.log(match.url);
+  const user = useAuth();
 
   const [itemsMenu, setItemsMenu ] = useState([
     { title: 'Dashboard', slug: '/', active: false },
@@ -13,15 +20,9 @@ const NavMenu = () => {
     { title: 'Calendar', slug: '/calendario', active: false },
   ]);
 
-  const datosUser = {
-    name: 'User',
-    mail: 'user@example.com',
-    photo: 'https://via.placeholder.com/200x200.png',
-  }
-
   const [ showMenuProfile, setShowMenuProfile ] = useState(false);
   const [ openMenuMobile, setOpenMenuMobile ] = useState(false);
-  
+
   useEffect(()=>{
     var url = match.url;
 
@@ -33,15 +34,19 @@ const NavMenu = () => {
     } )
   },[ match ])
 
+  const logout = async () => {
+    await firebase.auth().signOut();
+    history.push('/');
+  }
 
   const OptionProfile = ({ className }) => (
     <>
       <a href="/" className={ className } role="menuitem" >
         Tu Perfil
       </a>
-      <a href="/" className={ className } role="menuitem" >
+      <button className={ className } role="menuitem" onClick={ () => logout() }>
         Salir
-      </a>
+      </button>
     </>
   )
 
@@ -75,36 +80,39 @@ const NavMenu = () => {
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
-              
-              <div className="ml-3 relative">
-                <div>
-                  <button
-                    type="button"
-                    className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                    id="user-menu"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                    onClick={ ()=> setShowMenuProfile( !showMenuProfile )  }
-                  >
-                    <span className="sr-only">Open user menu</span>
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src={ datosUser.photo }
-                      alt={ datosUser.name }
-                    />
-                  </button>
-                </div>
+              {
+                user &&
+                <div className="ml-3 relative">
+                  <div>
+                    <button
+                      type="button"
+                      className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                      id="user-menu"
+                      aria-expanded="false"
+                      aria-haspopup="true"
+                      onClick={ ()=> setShowMenuProfile( !showMenuProfile )  }
+                    >
+                      <span className="sr-only">Open user menu</span>
+                      <span className="text-white pr-1">{ user.name }</span>
+                      <img
+                        className="h-8 w-8 rounded-full"
+                        src={ user.photo ? user.photo : imgProfile }
+                        alt={ user.name }
+                      />
+                    </button>
+                  </div>
 
-                <div
-                  className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="user-menu"
-                  style={ { display: showMenuProfile ? 'block' : 'none' } }
-                >
-                  <OptionProfile className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"/>
+                  <div
+                    className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="user-menu"
+                    style={ { display: showMenuProfile ? 'block' : 'none' } }
+                  >
+                    <OptionProfile className="text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"/>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
           <div className="-mr-2 flex md:hidden">
@@ -116,56 +124,60 @@ const NavMenu = () => {
               onClick={ ()=> { setOpenMenuMobile( !openMenuMobile ) } }
             >
               <span className="sr-only">Open main menu</span>
-              M
+              <img src={ iconMenu } alt="icon menu"/>
             </button>
           </div>
         </div>
       </div>
 
       <div 
-        className="md:hidden" id="mobile-menu"
+        className="md:hidden fixed w-full bg-gray-800" 
+        id="mobile-menu"
         style={ { display: openMenuMobile ? 'block' : 'none' } }
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           {
             itemsMenu.map( (item,i)=>(
-              <a 
-                href={ item.slug }
-                className={ 
+              <Link
+                key={ i }
+                to={ item.slug }
+                className={
                   item.active ? 
                   'bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium' :
                   'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium'
                 }
-                key={ i }
               >
                 { item.title }
-              </a>    
+              </Link>
             ))
           }
 
         </div>
-        <div className="pt-4 pb-3 border-t border-gray-700">
-          <div className="flex justify-center px-5">
-            <div className="flex-shrink-0">
-              <img
-                className="h-10 w-10 rounded-full"
-                src={ datosUser.photo }
-                alt={ datosUser.name }
-              />
+        {
+          user &&
+          <div className="pt-4 pb-3 border-t border-gray-700">
+            <div className="flex justify-center px-5">
+              <div className="flex-shrink-0">
+                <img
+                  className="h-10 w-10 rounded-full"
+                  src={ user.photo ? user.photo : imgProfile }
+                  alt={ user.name }
+                />
+              </div>
+              <div className="ml-3">
+                <div className="text-base font-medium leading-none text-white">
+                  { user.name }
+                </div>
+                <div className="text-sm font-medium leading-none text-gray-400">
+                  { user.email }
+                </div>
+              </div>
             </div>
-            <div className="ml-3">
-              <div className="text-base font-medium leading-none text-white">
-                { datosUser.name }
-              </div>
-              <div className="text-sm font-medium leading-none text-gray-400">
-                { datosUser.mail }
-              </div>
+            <div className="mt-3 px-2 space-y-1">
+              <OptionProfile className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"/>
             </div>
           </div>
-          <div className="mt-3 px-2 space-y-1">
-            <OptionProfile className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"/>
-          </div>
-        </div>
+        }
       </div>
     </nav>
   );

@@ -1,6 +1,8 @@
 import React from 'react'
 
-const Input = ({ type, title }) => {
+const Input = props => {
+    const { type, title } = props;
+    
     return (
         <div>
            <label htmlFor="company_website" className="block text-sm font-medium text-gray-700">
@@ -18,12 +20,10 @@ const Input = ({ type, title }) => {
                 <div className="mt-1 mb-2 flex rounded-md shadow-sm">
                     <input 
                         type={ type } 
-                        className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-md sm:text-sm border-gray-300 pt-1 pb-1"
+                        className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-md sm:text-sm border-gray-300 pt-1 pb-1"
                     />
                 </div>
             }
-
-            
         </div>
     )
 }
