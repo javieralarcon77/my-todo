@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { 
     BrowserRouter as Router,
     Route,
@@ -8,10 +9,29 @@ import {
 import Home from './pages/Home'
 import NewTodo from './pages/NewTodo'
 import Login from './pages/Login';
-import { FirebaseAuthConsumer } from '@react-firebase/auth';
 import Register from './pages/Register';
 
+import { firebase } from './firebase/firebase-config';
+import { login } from './redux/actions/auth';
+import { startLoadingNotes } from './redux/actions/notes';
+
 const AppRouter = () => {
+
+    const dispatch = useDispatch();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(()=>{
+        firebase.auth().onAuthStateChanged( (user) =>{
+            //console.log(user);
+            if( user?.uid ){
+                dispatch( login(user.uid, user.displayName) );
+                setIsLoggedIn(true);
+                dispatch( startLoadingNotes( user.uid ) );
+            }else{
+                setIsLoggedIn(false);
+            }
+        });
+    },[ dispatch , setIsLoggedIn ]);
 
     //const isLogin = firebase.authState();
 
@@ -40,18 +60,7 @@ const AppRouter = () => {
 
     return (
         <Router>
-            <FirebaseAuthConsumer>
-                {
-                    ({ isSignedIn }) => {
-                        return ( 
-                            isSignedIn ? 
-                            <RouterUser /> :
-                            <RouterPublic />
-                        )
-                    }
-                }
-            </FirebaseAuthConsumer>
-            
+            {   isLoggedIn ?  <RouterUser /> : <RouterPublic /> }
         </Router>
     )
 }

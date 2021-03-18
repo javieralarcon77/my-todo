@@ -1,10 +1,13 @@
 import React from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
+
 import { useForm } from '../hooks/useForm';
-import firebase from "firebase/app";
+import { startRegisterWithEmailPasswordName } from '../redux/actions/auth';
 
 const Register = () => {
-    let history = useHistory();
+
+    const dispatch = useDispatch();
 
     const [ formValues, handleInputChange ] = useForm({
         name: '',
@@ -17,12 +20,7 @@ const Register = () => {
 
     const handleSubmitRegister = async (e) => {
         e.preventDefault();
-
-        const data = await firebase.auth().createUserWithEmailAndPassword(email, password);
-        if(data.user){
-            data.user.updateProfile( { displayName: name } );
-            history.push("/");
-        }
+        dispatch( startRegisterWithEmailPasswordName(email, password, name) );
     }
 
     return (

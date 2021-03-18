@@ -1,18 +1,15 @@
-import './App.css';
+import React from 'react';
+
+import { Provider } from 'react-redux';
+import { store } from './redux/store/store';
+
 import AppRouter from './AppRouter';
-
-import firebase from "firebase/app";
-import "firebase/auth";
-import { FirebaseAuthProvider } from "@react-firebase/auth";
-
-import { configFirebase } from './config';
-
 
 const App = () => {
   return (
-    <FirebaseAuthProvider firebase={firebase} {...configFirebase}>
+    <Provider store={ store } >
       <AppRouter />
-    </FirebaseAuthProvider>
+    </Provider>
   );
 }
 

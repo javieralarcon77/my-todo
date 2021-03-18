@@ -1,13 +1,11 @@
 import React from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import firebase from "firebase/app";
-import swal from 'sweetalert';
+import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
 
 import { useForm } from '../hooks/useForm';
+import { startGoogleLogin, startLoginEmailPassword } from '../redux/actions/auth';
 
 const Login = () => {
-
-    let history = useHistory();
 
     const [ formValues, handleInputChange ] = useForm({
         email: '',
@@ -16,18 +14,17 @@ const Login = () => {
 
     const { email, password } = formValues;
 
+    const dispatch = useDispatch();
+    
     const handleSubmitLogin = async (e) => {
         e.preventDefault();
-        //console.log(formValues);
-        try{
-            await firebase.auth().signInWithEmailAndPassword( email, password );
-            history.push('/');
-        }catch(e){
-            //console.log(e);
-            swal('Error', e.message, 'error');
-        }
-
+        dispatch( startLoginEmailPassword( email, password ) );
     }
+
+    const handleGoogleLogin = () => {
+        dispatch( startGoogleLogin() );
+    }
+
 
     return (
         <div className="p-login">
@@ -101,11 +98,18 @@ const Login = () => {
                             </div> */}
                         </div>
                         <div>
-                            <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <button type="submit" className="mb-3 group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                             
                                 </span>
                                 Ingresar
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={ handleGoogleLogin }
+                                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                Ingresar Con Google
                             </button>
                         </div>
                     </form>
