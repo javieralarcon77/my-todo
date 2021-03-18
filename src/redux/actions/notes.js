@@ -17,6 +17,8 @@ export const startNewNote = (newNote) => {
 
         //dispatch( activeNote(doc.id, newNote) );
         dispatch( addNewNote(doc.id, newNote) );
+
+        await swal('Saved',newNote.title , 'success');
     }
 }
 

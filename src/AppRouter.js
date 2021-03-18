@@ -14,6 +14,7 @@ import Register from './pages/Register';
 import { firebase } from './firebase/firebase-config';
 import { login } from './redux/actions/auth';
 import { startLoadingNotes } from './redux/actions/notes';
+import TodoList from './pages/TodoList';
 
 const AppRouter = () => {
 
@@ -37,6 +38,9 @@ const AppRouter = () => {
 
     const RouterUser = () => (
         <Switch>
+            <Route path="/todo/list/">
+                <TodoList />
+            </Route>
             <Route path="/todo/new/">
                 <NewTodo />
             </Route>

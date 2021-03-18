@@ -1,15 +1,20 @@
 import React from 'react'
+import { useDispatch } from 'react-redux';
 
 import Card from '../components/atoms/Card'
 import Input from '../components/atoms/Input'
 import Layout from '../components/organisms/Layout'
 import { useForm } from '../hooks/useForm';
+import { startNewNote } from '../redux/actions/notes';
 
 const NewTodo = () => {
     
+    const dispatch = useDispatch();
+
     const [ formValues, handleInputChange ] = useForm({
         title: '',
         description: '',
+        photoUrl:'',
         datestart:'',
         dateend:''
     });
@@ -17,11 +22,14 @@ const NewTodo = () => {
     const { title, description, datestart, dateend } = formValues;
 
     const save = async () => {
-        // const params = {
-        //     ...formValues,
-        //     datestart: new Date(formValues.datestart ),
-        //     dateend:  new Date( formValues.dateend )
-        // };
+        const note = {
+            ...formValues,
+            datestart: new Date(formValues.datestart ).getTime(),
+            dateend:  new Date( formValues.dateend ).getTime()
+        };
+
+        dispatch( startNewNote( note ) );
+
     }
 
     return (
